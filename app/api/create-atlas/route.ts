@@ -53,7 +53,13 @@ export async function POST(req: Request) {
 
     const output = await atlas.toBuffer();
 
-    return new NextResponse(output, {
+    // ВАЖЛИВО: конвертуємо Buffer → ArrayBuffer правильно
+    const arrayBuffer = output.buffer.slice(
+      output.byteOffset,
+      output.byteOffset + output.byteLength
+    );
+
+    return new NextResponse(arrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -65,4 +71,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
