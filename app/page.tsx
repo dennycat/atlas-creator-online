@@ -10,6 +10,7 @@ export default function Home() {
   const [cellHeight, setCellHeight] = useState(512);
 
   const [showFrames, setShowFrames] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function onFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
@@ -17,8 +18,42 @@ export default function Home() {
     setFrames(list);
   }
 
-  function onCreateAtlas() {
-    alert("Тут пізніше буде створення атласу на сервері.");
+  async function onCreateAtlas() {
+    if (frames.length === 0) {
+      alert("Спочатку завантаж PNG файли.");
+      return;
+    }
+
+    setLoading(true);
+
+    const form = new FormData();
+    frames.forEach(f => form.append("frames", f));
+    form.append("cellsX", String(cellsX));
+    form.append("cellsY", String(cellsY));
+    form.append("cellWidth", String(cellWidth));
+    form.append("cellHeight", String(cellHeight));
+
+    const res = await fetch("/api/create-atlas", {
+      method: "POST",
+      body: form,
+    });
+
+    setLoading(false);
+
+    if (!res.ok) {
+      alert("Помилка при створенні атласу.");
+      return;
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "atlas.png";
+    a.click();
+
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -122,17 +157,18 @@ export default function Home() {
       <section style={{ marginTop: 32 }}>
         <button
           onClick={onCreateAtlas}
+          disabled={loading}
           style={{
             padding: "10px 20px",
             fontSize: 16,
             cursor: "pointer",
-            backgroundColor: "#00bcd4",
+            backgroundColor: loading ? "#555" : "#00bcd4",
             border: "none",
             borderRadius: 4,
             color: "#000",
           }}
         >
-          Створити атлас
+          {loading ? "Створення..." : "Створити атлас"}
         </button>
       </section>
     </main>
