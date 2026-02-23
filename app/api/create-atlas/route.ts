@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import sharp from "sharp";
 
 export const runtime = "nodejs";
@@ -14,7 +13,10 @@ export async function POST(req: Request) {
     const cellHeight = Number(formData.get("cellHeight"));
 
     if (files.length === 0) {
-      return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
+      return new Response(JSON.stringify({ error: "No files uploaded" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     const atlasWidth = cellsX * cellWidth;
@@ -49,13 +51,13 @@ export async function POST(req: Request) {
 
     const output = await atlas.toBuffer();
 
-    // ВАЖЛИВО: правильне перетворення Buffer → ArrayBuffer
+    // Конвертуємо Buffer → ArrayBuffer
     const arrayBuffer = output.buffer.slice(
       output.byteOffset,
       output.byteOffset + output.byteLength
     );
 
-    return new NextResponse(arrayBuffer, {
+    return new Response(arrayBuffer, {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -64,6 +66,9 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return new Response(JSON.stringify({ error: "Server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
