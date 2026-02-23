@@ -51,7 +51,6 @@ export async function POST(req: Request) {
 
     const output = await atlas.toBuffer();
 
-    // ВАЖЛИВО: Next.js 16 приймає тільки Uint8Array
     return new Response(new Uint8Array(output), {
       status: 200,
       headers: {
