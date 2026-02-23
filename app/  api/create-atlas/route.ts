@@ -51,12 +51,8 @@ export async function POST(req: Request) {
 
     const output = await atlas.toBuffer();
 
-    const arrayBuffer = output.buffer.slice(
-      output.byteOffset,
-      output.byteOffset + output.byteLength
-    );
-
-    return new Response(arrayBuffer, {
+    // ВАЖЛИВО: Next.js 16 приймає тільки Uint8Array
+    return new Response(new Uint8Array(output), {
       status: 200,
       headers: {
         "Content-Type": "image/png",
@@ -71,4 +67,3 @@ export async function POST(req: Request) {
     });
   }
 }
-
