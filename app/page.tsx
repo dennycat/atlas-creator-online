@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 export default function Home() {
   const [frames, setFrames] = useState<File[]>([]);
@@ -11,6 +11,8 @@ export default function Home() {
 
   const [showFrames, setShowFrames] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   function onFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     if (!e.target.files) return;
@@ -73,18 +75,44 @@ export default function Home() {
       <section style={{ marginTop: 24 }}>
         <h2 style={{ fontSize: 20 }}>Завантаження PNG файлів</h2>
         <p>Вибери PNG кадри, які хочеш зібрати в атлас.</p>
-        <input type="file" multiple accept="image/png" onChange={onFilesSelected} />
+
+        {/* Прихований input */}
+        <input
+          type="file"
+          multiple
+          accept="image/png"
+          ref={fileInputRef}
+          onChange={onFilesSelected}
+          style={{ display: "none" }}
+        />
+
+        {/* Велика кнопка */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#444",
+            color: "#fff",
+            border: "1px solid #666",
+            borderRadius: 6,
+            cursor: "pointer",
+            fontSize: 16,
+          }}
+        >
+          Завантажити PNG файли
+        </button>
 
         <button
           onClick={() => setShowFrames(!showFrames)}
           style={{
             marginLeft: 12,
-            padding: "6px 12px",
+            padding: "10px 20px",
             cursor: "pointer",
             backgroundColor: "#333",
             color: "#eee",
             border: "1px solid #555",
-            borderRadius: 4,
+            borderRadius: 6,
+            fontSize: 16,
           }}
         >
           Показати / сховати список ({frames.length})
@@ -159,12 +187,12 @@ export default function Home() {
           onClick={onCreateAtlas}
           disabled={loading}
           style={{
-            padding: "10px 20px",
-            fontSize: 16,
+            padding: "12px 24px",
+            fontSize: 18,
             cursor: "pointer",
             backgroundColor: loading ? "#555" : "#00bcd4",
             border: "none",
-            borderRadius: 4,
+            borderRadius: 6,
             color: "#000",
           }}
         >
