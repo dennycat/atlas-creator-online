@@ -51,7 +51,6 @@ export async function POST(req: Request) {
 
     const output = await atlas.toBuffer();
 
-    // Конвертуємо Buffer → ArrayBuffer
     const arrayBuffer = output.buffer.slice(
       output.byteOffset,
       output.byteOffset + output.byteLength
