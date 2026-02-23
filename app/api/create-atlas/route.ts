@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 
-export const runtime = "nodejs"; // Дозволяє використовувати sharp на Vercel
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
@@ -17,11 +17,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No files uploaded" }, { status: 400 });
     }
 
-    // Загальний розмір атласу
     const atlasWidth = cellsX * cellWidth;
     const atlasHeight = cellsY * cellHeight;
 
-    // Порожнє полотно
     let atlas = sharp({
       create: {
         width: atlasWidth,
@@ -31,7 +29,6 @@ export async function POST(req: Request) {
       },
     }).png();
 
-    // Масив шарів для compositing
     const layers: sharp.OverlayOptions[] = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -48,12 +45,11 @@ export async function POST(req: Request) {
       });
     }
 
-    // Накладаємо всі PNG на полотно
     atlas = atlas.composite(layers);
 
     const output = await atlas.toBuffer();
 
-    // ВАЖЛИВО: конвертуємо Buffer → ArrayBuffer правильно
+    // ВАЖЛИВО: правильне перетворення Buffer → ArrayBuffer
     const arrayBuffer = output.buffer.slice(
       output.byteOffset,
       output.byteOffset + output.byteLength
